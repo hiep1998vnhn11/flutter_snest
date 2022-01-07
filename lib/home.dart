@@ -5,6 +5,7 @@ import 'package:snest/screens/notification.dart';
 import 'package:snest/screens/setting.dart';
 import 'package:snest/store/auth.dart';
 import 'package:get/get.dart';
+import 'package:snest/screens/profile.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     const Dashboard(),
     const Chat(),
     const NotificationScreen(),
-    const Setting(),
+    const Profile(),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();
@@ -143,7 +144,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     onPressed: () {
                       setState(() {
                         currentTab = 3;
-                        currentSreen = const Setting();
+                        currentSreen = const Profile();
                       });
                     },
                     shape: currentTab == 3
