@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:snest/screens/chat.dart';
 import 'package:snest/screens/dashboard.dart';
 import 'package:snest/screens/notification.dart';
-import 'package:snest/screens/setting.dart';
+// import 'package:snest/screens/setting.dart';
 import 'package:snest/store/auth.dart';
 import 'package:get/get.dart';
 import 'package:snest/screens/profile.dart';

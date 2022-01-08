@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:snest/home.dart';
-import 'package:snest/screens/auth/login.dart';
+// import 'package:snest/screens/auth/login.dart';
+import 'package:snest/app.dart';
 
 void main() {
   runApp(const App());
@@ -24,7 +25,7 @@ class App extends StatelessWidget {
           // Notice that the counter didn't reset back to zero; the application
           // is not restarted.
           primarySwatch: Colors.blue),
-      home: const Login(),
+      home: MyApp(),
     );
   }
 }

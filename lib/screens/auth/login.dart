@@ -1,3 +1,7 @@
+// import 'dart:convert';
+// import 'dart:io';
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:snest/util/animations.dart';
@@ -8,6 +12,11 @@ import 'package:snest/util/validations.dart';
 import 'package:snest/home.dart';
 import 'package:snest/widgets/custom_button.dart';
 import 'package:snest/widgets/custom_text_field.dart';
+// import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:snest/util/http.dart';
+import 'package:get/get.dart';
+import 'package:snest/store/auth.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -25,25 +34,53 @@ class _LoginState extends State<Login> {
   FocusNode nameFN = FocusNode();
   FocusNode emailFN = FocusNode();
   FocusNode passFN = FocusNode();
-  FormMode formMode = FormMode.LOGIN;
+  FormMode formMode = FormMode.login;
+  AuthController authController = Get.put(AuthController());
+
+  Future<bool> ayncLogin() async {
+    try {
+      Map<String, dynamic> data = await HttpService.post('/login', {
+        'username': email,
+        'password': password,
+        'platform': '1',
+        'uuid': '123',
+        'type': '1'
+      });
+      final String token = data['access_token'];
+      final Map<String, dynamic> user = data['data'];
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', token);
+      authController.setToken(token);
+      authController.setUser(user);
+      return true;
+    } catch (e) {
+      // ignore: avoid_print
+      print(e);
+      return false;
+    }
+  }
 
   submit() async {
     try {
       setState(() {
         loading = true;
       });
-
       FormState? form = formKey.currentState;
       form?.save();
       if (!form!.validate()) {
         setState(() {
           validate = true;
         });
-        toastError('Hãy điền đầy đủ thông tin!');
-      } else {
+        return toastError('Hãy điền đầy đủ thông tin!');
+      }
+      final bool isLogin = await ayncLogin();
+      if (isLogin) {
         Navigate.pushPageReplacement(context, const Home());
+      } else {
+        return toastError('Thông tin đăng nhập không chính xác!');
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     } finally {
       setState(() {
@@ -89,7 +126,7 @@ class _LoginState extends State<Login> {
     return AnimatedContainer(
       width: screenWidth < 700 ? 0 : screenWidth * 0.5,
       duration: const Duration(milliseconds: 500),
-      color: Theme.of(context).accentColor.withOpacity(0.3),
+      color: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
       child: Center(
         child: Lottie.asset(
           AppAnimations.chatAnimation,
@@ -124,16 +161,16 @@ class _LoginState extends State<Login> {
           child: buildForm(),
         ),
         Visibility(
-          visible: formMode == FormMode.LOGIN,
+          visible: formMode == FormMode.login,
           child: Column(
             children: [
               const SizedBox(height: 10.0),
               Align(
                 alignment: Alignment.centerRight,
-                child: FlatButton(
+                child: TextButton(
                   onPressed: () {
                     setState(() {
-                      formMode = FormMode.FORGOT_PASSWORD;
+                      formMode = FormMode.forgorPassword;
                     });
                   },
                   child: const Text('Quên mật khẩu?',
@@ -146,15 +183,15 @@ class _LoginState extends State<Login> {
         const SizedBox(height: 20.0),
         buildButton(),
         Visibility(
-          visible: formMode == FormMode.LOGIN,
+          visible: formMode == FormMode.login,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text('Bạn chưa có tài khoản?'),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   setState(() {
-                    formMode = FormMode.REGISTER;
+                    formMode = FormMode.register;
                   });
                 },
                 child: const Text('Đăng ký ngay',
@@ -164,15 +201,15 @@ class _LoginState extends State<Login> {
           ),
         ),
         Visibility(
-          visible: formMode != FormMode.LOGIN,
+          visible: formMode != FormMode.login,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text('Đã có tài khoản?'),
-              FlatButton(
+              TextButton(
                 onPressed: () {
                   setState(() {
-                    formMode = FormMode.LOGIN;
+                    formMode = FormMode.login;
                   });
                 },
                 child: const Text('Đăng nhập',
@@ -189,7 +226,7 @@ class _LoginState extends State<Login> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        formMode == FormMode.REGISTER
+        formMode == FormMode.register
             ? Column(
                 children: [
                   CustomTextField(
@@ -209,16 +246,15 @@ class _LoginState extends State<Login> {
             : const SizedBox(height: 0.0),
         CustomTextField(
           enabled: !loading,
-          hintText: "Email",
+          hintText: "Tài khoản",
           textInputAction: TextInputAction.next,
-          validateFunction: Validations.validateEmail,
           onSaved: (String? val) {
             email = val ?? '';
           },
           focusNode: emailFN,
           nextFocusNode: passFN,
         ),
-        formMode != FormMode.FORGOT_PASSWORD
+        formMode != FormMode.forgorPassword
             ? Column(
                 children: [
                   const SizedBox(height: 20.0),
@@ -242,20 +278,19 @@ class _LoginState extends State<Login> {
   }
 
   buildButton() {
-    return loading
-        ? const Center(child: CircularProgressIndicator())
-        : CustomButton(
-            label: getButtonName(),
-            onPressed: submit,
-          );
+    return CustomButton(
+      label: getButtonName(),
+      onPressed: submit,
+      loading: loading,
+    );
   }
 
   getButtonName() {
-    if (formMode == FormMode.LOGIN) {
+    if (formMode == FormMode.login) {
       return "Đăng nhập";
-    } else if (formMode == FormMode.REGISTER) {
+    } else if (formMode == FormMode.register) {
       return "Đăng ký";
-    } else if (formMode == FormMode.FORGOT_PASSWORD) {
+    } else if (formMode == FormMode.forgorPassword) {
       return "Lấy lại mật khẩu";
     }
     return "";

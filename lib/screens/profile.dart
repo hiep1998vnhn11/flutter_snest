@@ -18,7 +18,7 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Container(
+        child: SizedBox(
           width: MediaQuery.of(context).size.width,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -48,21 +48,19 @@ class _ProfileState extends State<Profile> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: const Icon(
                       Icons.message,
                       color: Colors.white,
                     ),
-                    color: Colors.grey,
                     onPressed: () {},
                   ),
                   const SizedBox(width: 10),
-                  FlatButton(
+                  TextButton(
                     child: const Icon(
                       Icons.add,
                       color: Colors.white,
                     ),
-                    color: Theme.of(context).accentColor,
                     onPressed: () {},
                   ),
                 ],
@@ -112,15 +110,15 @@ class _ProfileState extends State<Profile> {
       children: <Widget>[
         Text(
           random.nextInt(10000).toString(),
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           title,
-          style: TextStyle(),
+          style: const TextStyle(),
         ),
       ],
     );

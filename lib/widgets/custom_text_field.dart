@@ -11,6 +11,7 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? submitAction;
   final bool obscureText;
   final FormFieldValidator<String>? validateFunction;
+  final String? label;
   final void Function(String?)? onSaved, onChange;
   @override
   // ignore: overridden_fields
@@ -28,45 +29,48 @@ class CustomTextField extends StatelessWidget {
       this.obscureText = false,
       this.validateFunction,
       this.onSaved,
+      this.label,
       this.onChange})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      child: TextFormField(
-        initialValue: initialValue,
-        enabled: enabled,
-        onChanged: onChange,
-        style: const TextStyle(
-          fontSize: 15.0,
-        ),
-        key: key,
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: textInputType,
-        validator: validateFunction,
-        onSaved: onSaved,
-        textInputAction: textInputAction,
-        focusNode: focusNode,
-        onFieldSubmitted: (String term) {
-          if (nextFocusNode != null) {
-            focusNode?.unfocus();
-            FocusScope.of(context).requestFocus(nextFocusNode);
-          } else {
-            submitAction!();
-          }
-        },
-        decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              color: Colors.grey[400],
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
-            border: border(),
-            focusedBorder: border(),
-            disabledBorder: border()),
-      ),
+      child: Column(children: [
+        TextFormField(
+          initialValue: initialValue,
+          enabled: enabled,
+          onChanged: onChange,
+          style: const TextStyle(
+            fontSize: 15.0,
+          ),
+          key: key,
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: textInputType,
+          validator: validateFunction,
+          onSaved: onSaved,
+          textInputAction: textInputAction,
+          focusNode: focusNode,
+          onFieldSubmitted: (String term) {
+            if (nextFocusNode != null) {
+              focusNode?.unfocus();
+              FocusScope.of(context).requestFocus(nextFocusNode);
+            } else {
+              submitAction!();
+            }
+          },
+          decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: TextStyle(
+                color: Colors.grey[400],
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+              border: border(),
+              focusedBorder: border(),
+              disabledBorder: border()),
+        )
+      ]),
     );
   }
 

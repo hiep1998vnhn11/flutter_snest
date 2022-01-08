@@ -31,7 +31,7 @@ class _PostItemState extends State<PostItem> {
                   widget.dp,
                 ),
               ),
-              contentPadding: EdgeInsets.all(0),
+              contentPadding: const EdgeInsets.all(0),
               title: Text(
                 widget.name,
                 style: const TextStyle(

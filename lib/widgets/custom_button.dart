@@ -4,12 +4,14 @@ class CustomButton extends StatelessWidget {
   final String label;
   final Function() onPressed;
   final Color color;
+  final bool loading;
 
   const CustomButton({
     Key? key,
     this.label = 'Continue',
     required this.onPressed,
     this.color = Colors.blue,
+    this.loading = false,
   }) : super(key: key);
 
   bool isSmallScreen(BuildContext context) {
@@ -18,25 +20,24 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 50.0,
       width: MediaQuery.of(context).size.width,
-      child: FlatButton(
+      child: TextButton(
         onPressed: onPressed,
-        color: color,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          ),
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 18.0,
-            color: Colors.white,
-          ),
-        ),
+        child: loading
+            ? const Center(
+                child: CircularProgressIndicator(
+                color: Colors.white,
+              ))
+            : Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18.0,
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }

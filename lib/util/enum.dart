@@ -1,1 +1,1 @@
-enum FormMode { LOGIN, REGISTER, FORGOT_PASSWORD }
+enum FormMode { login, register, forgorPassword }

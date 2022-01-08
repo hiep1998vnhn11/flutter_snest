@@ -30,7 +30,7 @@ class _ChatBubbleState extends State<ChatBubble> {
 
   Color chatBubbleColor() {
     if (widget.isMe) {
-      return Theme.of(context).accentColor;
+      return Theme.of(context).colorScheme.secondary;
     } else {
       if (Theme.of(context).brightness == Brightness.dark) {
         return Colors.grey;
@@ -126,7 +126,8 @@ class _ChatBubbleState extends State<ChatBubble> {
                               child: Text(
                                 widget.isMe ? "You" : widget.replyName,
                                 style: TextStyle(
-                                  color: Theme.of(context).accentColor,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),

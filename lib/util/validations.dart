@@ -22,12 +22,12 @@ class Validations {
     if (value == null || value.isEmpty || value.length < 6) {
       return 'Mật khẩu phải có ít nhất 6 ký tự.';
     }
-    String pattern =
-        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
-    RegExp passwordExp = RegExp(pattern);
-    if (!passwordExp.hasMatch(value)) {
-      return 'Mật khẩu phải có ít nhất một ký tự đặc biệt, một chữ hoa, một chữ thường và một số.';
-    }
+    // String pattern =
+    //     r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    // RegExp passwordExp = RegExp(pattern);
+    // if (!passwordExp.hasMatch(value)) {
+    //   return 'Mật khẩu phải có ít nhất một ký tự đặc biệt, một chữ hoa, một chữ thường và một số.';
+    // }
     return null;
   }
 }
