@@ -1,33 +1,29 @@
 import 'package:flutter/material.dart';
 
 class GridImage extends StatelessWidget {
-  final Set<String> images;
-  GridImage({this.images = []});
+  final List<String> images;
+  const GridImage({Key? key, this.images = const []}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Image.asset(
-            image,
-            height: 200,
-            width: 200,
+    return Column(children: _buildListImage());
+  }
+
+  List<Widget> _buildListImage() {
+    return images
+        .map(
+          (image) => Container(
+            width: double.infinity,
+            height: 220,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              image: DecorationImage(
+                image: NetworkImage(image),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-          Text(
-            title,
-            style: TextStyle(fontSize: 20),
-          ),
-          Text(
-            description,
-            style: TextStyle(fontSize: 15),
-          ),
-          Text(
-            price,
-            style: TextStyle(fontSize: 20),
-          ),
-        ],
-      ),
-    );
+        )
+        .toList();
   }
 }

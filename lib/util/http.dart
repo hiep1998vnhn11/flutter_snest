@@ -7,13 +7,17 @@ const Map<String, dynamic> defaultParams = {};
 const Map<String, bool> defaultOptions = {'withAuth': true};
 
 class HttpService {
-  static Future<dynamic> get(String url,
-      [Map<String, bool> options = defaultOptions]) async {
+  static Future<dynamic> get(
+    String url, [
+    Map<String, dynamic> queryParameters = defaultParams,
+    Map<String, bool> options = defaultOptions,
+  ]) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
       http.Response res = await http.get(
-        Uri.http(Constants.apiHost, "${Constants.apiPrefix}$url"),
+        Uri.http(
+            Constants.apiHost, "${Constants.apiPrefix}$url", queryParameters),
         headers: {
           'Accept': 'application/json',
           'Authorization': options['withAuth'] == true ? 'Bearer $token' : '',

@@ -16,28 +16,34 @@ class _ProfileState extends State<Profile> {
   Map<String, dynamic> user = {};
   final AuthController authController = Get.find();
   static Random random = Random();
+
+  Future<void> _getUserInfo() async {
+    try {
+      final String url = '/v1/user/${widget.id}/get_info';
+      final Map<String, dynamic> info = await HttpService.get(url);
+      setState(() {
+        user = info;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    _getUserInfo();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<void> _getUserInfo() async {
-      try {
-        final String url = '/v1/user/${widget.id}/get_info';
-        final Map<String, dynamic> info = await HttpService.get(url);
-        print(info);
-        print('123');
-        setState(() {
-          user = {};
-        });
-      } catch (e) {
-        print(e);
-      }
-    }
-
-    if (mounted) {
-      _getUserInfo();
-    }
+    print(user);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(
+          user['full_name'] ?? 'Người dùng Snest',
+          style: const TextStyle(fontSize: 18),
+        ),
         toolbarHeight: 45,
       ),
       body: SingleChildScrollView(
@@ -48,25 +54,153 @@ class _ProfileState extends State<Profile> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(height: 60),
-              CircleAvatar(
-                backgroundImage: AssetImage(
-                  "images/cm${random.nextInt(10)}.jpeg",
-                ),
-                radius: 50,
+              const SizedBox(height: 10),
+              Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      image: user['info']?['profile_background_path'] != null
+                          ? DecorationImage(
+                              image: NetworkImage(
+                                  user['info']['profile_background_path']),
+                              fit: BoxFit.cover,
+                            )
+                          : const DecorationImage(
+                              image: AssetImage(
+                                'images/background-default.jpg',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 16.0,
+                    right: 16.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(35),
+                      ),
+                      height: 35,
+                      width: 35,
+                      child: const Center(
+                        child: SizedBox(
+                          // decoration: BoxDecoration(
+                          //   color: Colors.greenAccent,
+                          //   borderRadius: BorderRadius.circular(12),
+                          // ),
+                          child: Icon(Icons.camera_alt, size: 20),
+                          height: 20,
+                          width: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 8.0,
+                    right: MediaQuery.of(context).size.width / 2 - 70,
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(60),
+                          ),
+                          height: 120,
+                          width: 120,
+                          child: Center(
+                            child: SizedBox(
+                              child: user['profile_photo_path'] == null
+                                  ? CircleAvatar(
+                                      backgroundImage: AssetImage(
+                                        "images/cm${random.nextInt(10)}.jpeg",
+                                      ),
+                                      radius: 50,
+                                    )
+                                  : CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        user['profile_photo_path'],
+                                      ),
+                                      radius: 50,
+                                    ),
+                              width: 115,
+                              height: 115,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0.0,
+                          left: 20.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            height: 16,
+                            width: 16,
+                            child: Center(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color:
+                                      user['online_status']?['status'] == true
+                                          ? Colors.greenAccent
+                                          : Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                height: 14,
+                                width: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 8.0,
+                          right: 8.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            height: 30,
+                            width: 30,
+                            child: Center(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                height: 28,
+                                width: 28,
+                                child: const Center(
+                                  child: Icon(Icons.camera_alt, size: 20),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               Text(
-                '${user['user']}',
+                '${user['full_name']}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
                 ),
               ),
               const SizedBox(height: 3),
-              const Text(
-                "Status should be here",
-                style: TextStyle(),
+              const Divider(
+                color: Colors.grey,
+              ),
+              Text(
+                "${user['info']?['story'] ?? ''}",
+                style: const TextStyle(),
               ),
               const SizedBox(height: 20),
               Row(
@@ -75,7 +209,6 @@ class _ProfileState extends State<Profile> {
                   TextButton(
                     child: const Icon(
                       Icons.message,
-                      color: Colors.white,
                     ),
                     onPressed: () {},
                   ),
@@ -83,7 +216,6 @@ class _ProfileState extends State<Profile> {
                   TextButton(
                     child: const Icon(
                       Icons.add,
-                      color: Colors.white,
                     ),
                     onPressed: () {},
                   ),

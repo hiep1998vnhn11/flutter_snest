@@ -43,14 +43,12 @@ class _LoginState extends State<Login> {
         'email': email,
         'password': password,
       });
-      print(data);
       final String token = data['access_token'];
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', token);
       authController.setToken(token);
-      print(token);
-      Map<String, dynamic> user = await HttpService.post('/auth/me');
-      authController.setUser(user);
+      var user = await HttpService.post('/auth/me');
+      // authController.setUser(user);
       return true;
     } catch (e) {
       // ignore: avoid_print

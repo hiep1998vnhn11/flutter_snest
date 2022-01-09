@@ -21,18 +21,20 @@ class MyApp extends StatelessWidget {
   }
 
   Future<String> _calculation() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? token = prefs.getString('token');
-    if (token != null) {
-      authController.setToken(token);
-      if (authController.user.value == null) {
-        Map<String, dynamic> user = await HttpService.post('/auth/me');
-        // print(user);
-        authController.setUser(user);
-        print(authController.user.value);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+      if (token != null) {
+        authController.setToken(token);
+        // if (authController.user.value == null) {
+        //   Map<String, dynamic> user = await HttpService.post('/auth/me');
+        //   authController.setUser(user);
+        // }
       }
+      return token ?? '';
+    } catch (e) {
+      return '';
     }
-    return token ?? '';
   }
 
   @override

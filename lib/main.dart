@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // import 'package:snest/screens/auth/login.dart';
 import 'package:snest/app.dart';
 import 'package:get/get.dart';
+// import 'package:snest/screens/test.dart';
 
 void main() {
   runApp(const App());

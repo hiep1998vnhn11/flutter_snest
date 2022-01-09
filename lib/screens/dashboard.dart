@@ -6,6 +6,7 @@ import 'package:snest/util/data.dart';
 import 'dart:async';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:snest/components/post_item.dart';
+import 'package:snest/util/http.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -18,27 +19,64 @@ class _DashboardState extends State<Dashboard> {
   final AuthController authController = Get.find();
   String input = '';
   Timer? _debouncer;
+  List posts = [];
+  int itemCount = 0;
+  bool isOver = false;
+
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
-  int itemCount = 5;
+
+  Future<bool> _fetchPost({bool? isRefresh = true}) async {
+    if (isRefresh != true && isOver) return false;
+    try {
+      int offset = 0;
+      const int limit = 5;
+      if (isRefresh != true) {
+        offset = itemCount;
+      } else {
+        setState(() {
+          isOver = false;
+          itemCount = 0;
+          posts = [];
+        });
+      }
+      var query = {
+        'offset': '$offset',
+        'limit': '$limit',
+      };
+      List res = await HttpService.get('/v1/user/post', query);
+      setState(() {
+        if (res.length < limit) {
+          isOver = true;
+        }
+        if (isRefresh != true) {
+          posts.addAll(res);
+          itemCount += res.length;
+        } else {
+          posts = res;
+          itemCount = res.length;
+        }
+      });
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 
   void _onRefresh() async {
-    setState(() {
-      itemCount = 0;
-    });
-    await Future.delayed(const Duration(milliseconds: 1000));
-    setState(() {
-      itemCount = 5;
-    });
+    await _fetchPost(isRefresh: true);
     _refreshController.refreshCompleted();
   }
 
   void _onLoading() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-    setState(() {
-      itemCount += 5;
-    });
-    _refreshController.loadComplete();
+    final success = await _fetchPost(isRefresh: false);
+    if (success) {
+      _refreshController.loadComplete();
+    } else {
+      print('noData');
+      _refreshController.loadNoData();
+    }
   }
 
   _onInputChange(String value) {
@@ -48,6 +86,12 @@ class _DashboardState extends State<Dashboard> {
         input = value;
       });
     });
+  }
+
+  @override
+  void initState() {
+    _fetchPost(isRefresh: true);
+    super.initState();
   }
 
   @override
@@ -92,7 +136,6 @@ class _DashboardState extends State<Dashboard> {
           onRefresh: _onRefresh,
           onLoading: _onLoading,
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
             itemCount: itemCount,
             itemBuilder: _buildPostItem,
           )),
@@ -100,14 +143,19 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Widget _buildPostItem(BuildContext context, int index) {
-    final int len = posts.length;
-    final int i = index % len;
-    Map post = posts[i];
+    final post = posts[index];
+    // print(post);
+    final List<String> images = (post['images'] as List)
+        .map((image) => image['path'] as String)
+        .toList();
     return PostItem(
-      img: post['img'],
-      name: post['name'],
-      dp: post['dp'],
-      time: post['time'],
+      name: post['user_name'],
+      avatar: post['user_profile_photo_path'],
+      time: post['created_at'],
+      content: post['content'],
+      images: images,
+      id: post['id'],
+      privacy: post['privacy'],
     );
   }
 
