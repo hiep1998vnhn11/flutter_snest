@@ -6,10 +6,14 @@ class AuthController extends GetxController {
   Rx<String?> token = ''.obs;
 
   increate() => count++;
-  setUser(Map<String, dynamic>? data) => user.update((value) {
-        value = data;
-      });
-  setToken(String? data) => token.update((value) {
-        value = data;
-      });
+  setUser(Map<String, dynamic>? data) => user.update(
+        (value) {
+          value = data;
+        },
+      );
+  setToken(String? data) => token.update(
+        (value) {
+          value = data;
+        },
+      );
 }

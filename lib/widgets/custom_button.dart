@@ -26,16 +26,12 @@ class CustomButton extends StatelessWidget {
       child: TextButton(
         onPressed: onPressed,
         child: loading
-            ? const Center(
-                child: CircularProgressIndicator(
-                color: Colors.white,
-              ))
+            ? const Center(child: CircularProgressIndicator())
             : Text(
                 label,
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 18.0,
-                  color: Colors.white,
                 ),
               ),
       ),

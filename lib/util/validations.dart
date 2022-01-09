@@ -1,7 +1,7 @@
 class Validations {
   static String? validateName(String? value) {
     if (value == null || value.isEmpty) return 'Hãy nhập tên của bạn.';
-    final RegExp nameExp = RegExp(r'^[A-za-zğüşöçİĞÜŞÖÇ ]+$');
+    final RegExp nameExp = RegExp(r'^[A-za-z0-9ğüşöçİĞÜŞÖÇ ]+$');
     if (!nameExp.hasMatch(value)) {
       return 'Tên của bạn không được chứa ký tự đặc biệt!';
     }

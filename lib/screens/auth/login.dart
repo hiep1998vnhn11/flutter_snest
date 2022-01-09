@@ -39,18 +39,17 @@ class _LoginState extends State<Login> {
 
   Future<bool> ayncLogin() async {
     try {
-      Map<String, dynamic> data = await HttpService.post('/login', {
-        'username': email,
+      Map<String, dynamic> data = await HttpService.post('/auth/login', {
+        'email': email,
         'password': password,
-        'platform': '1',
-        'uuid': '123',
-        'type': '1'
       });
+      print(data);
       final String token = data['access_token'];
-      final Map<String, dynamic> user = data['data'];
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', token);
       authController.setToken(token);
+      print(token);
+      Map<String, dynamic> user = await HttpService.post('/auth/me');
       authController.setUser(user);
       return true;
     } catch (e) {
@@ -80,7 +79,6 @@ class _LoginState extends State<Login> {
         return toastError('Thông tin đăng nhập không chính xác!');
       }
     } catch (e) {
-      // ignore: avoid_print
       print(e);
     } finally {
       setState(() {

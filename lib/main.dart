@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 // import 'package:snest/home.dart';
 // import 'package:snest/screens/auth/login.dart';
 import 'package:snest/app.dart';
+import 'package:get/get.dart';
 
 void main() {
   runApp(const App());
@@ -12,9 +13,10 @@ class App extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Snest',
       theme: ThemeData(
+          brightness: Brightness.light,
           // This is the theme of your application.
           //
           // Try running your application with "flutter run". You'll see the
@@ -25,6 +27,13 @@ class App extends StatelessWidget {
           // Notice that the counter didn't reset back to zero; the application
           // is not restarted.
           primarySwatch: Colors.blue),
+      darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          primaryColor: Colors.blueGrey,
+          secondaryHeaderColor: Colors.red),
+      themeMode: ThemeMode.light,
+      color: Colors.white,
+      debugShowCheckedModeBanner: false,
       home: MyApp(),
     );
   }

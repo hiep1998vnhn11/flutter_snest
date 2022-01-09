@@ -1,21 +1,45 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:snest/util/data.dart';
+import 'package:get/get.dart';
+import 'package:snest/store/auth.dart';
+import 'package:snest/util/http.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({Key? key}) : super(key: key);
-
+  const Profile({Key? key, required this.id}) : super(key: key);
+  final String id;
   @override
   _ProfileState createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
+  Map<String, dynamic> user = {};
+  final AuthController authController = Get.find();
   static Random random = Random();
-
   @override
   Widget build(BuildContext context) {
+    Future<void> _getUserInfo() async {
+      try {
+        final String url = '/v1/user/${widget.id}/get_info';
+        final Map<String, dynamic> info = await HttpService.get(url);
+        print(info);
+        print('123');
+        setState(() {
+          user = {};
+        });
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    if (mounted) {
+      _getUserInfo();
+    }
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        toolbarHeight: 45,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: SizedBox(
@@ -33,7 +57,7 @@ class _ProfileState extends State<Profile> {
               ),
               const SizedBox(height: 10),
               Text(
-                names[random.nextInt(10)],
+                '${user['user']}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
@@ -82,15 +106,15 @@ class _ProfileState extends State<Profile> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 primary: false,
-                padding: const EdgeInsets.all(5),
-                itemCount: 15,
+                padding: const EdgeInsets.all(2),
+                itemCount: 35,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
-                  childAspectRatio: 200 / 200,
+                  childAspectRatio: 1 / 1,
                 ),
                 itemBuilder: (BuildContext context, int index) {
                   return Padding(
-                    padding: const EdgeInsets.all(5.0),
+                    padding: const EdgeInsets.all(2.0),
                     child: Image.asset(
                       "images/cm${random.nextInt(10)}.jpeg",
                       fit: BoxFit.cover,

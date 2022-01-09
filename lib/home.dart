@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:snest/screens/chat.dart';
+// import 'package:snest/screens/chat.dart';
 import 'package:snest/screens/dashboard.dart';
 import 'package:snest/screens/notification.dart';
-// import 'package:snest/screens/setting.dart';
+import 'package:snest/screens/setting.dart';
 import 'package:snest/store/auth.dart';
 import 'package:get/get.dart';
-import 'package:snest/screens/profile.dart';
+// import 'package:snest/screens/profile.dart';
+import 'package:snest/screens/chat/chats.dart';
+import 'package:snest/screens/post/create_post.dart';
+import 'package:snest/util/router.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -18,10 +21,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   final AuthController authController = Get.put(AuthController());
   int currentTab = 0;
   final List<Widget> screens = [
-    const Dashboard(),
-    const Chat(),
-    const NotificationScreen(),
-    const Profile(),
+    Dashboard(),
+    Chats(),
+    NotificationScreen(),
+    Setting(),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();
@@ -36,7 +39,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          authController.increate();
+          Navigate.pushPage(context, const CreatePost());
         },
         child: const Icon(Icons.add),
         shape: const CircleBorder(),
@@ -55,7 +58,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   onPressed: () {
                     setState(() {
                       currentTab = 0;
-                      currentSreen = const Dashboard();
+                      currentSreen = screens[0];
                     });
                   },
                   shape: currentTab == 0
@@ -83,7 +86,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   onPressed: () {
                     setState(() {
                       currentTab = 1;
-                      currentSreen = const Chat();
+                      currentSreen = screens[1];
                     });
                   },
                   shape: currentTab == 1
@@ -115,7 +118,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     onPressed: () {
                       setState(() {
                         currentTab = 2;
-                        currentSreen = const NotificationScreen();
+                        currentSreen = screens[2];
                       });
                     },
                     shape: currentTab == 2
@@ -144,7 +147,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     onPressed: () {
                       setState(() {
                         currentTab = 3;
-                        currentSreen = const Profile();
+                        currentSreen = screens[3];
                       });
                     },
                     shape: currentTab == 3

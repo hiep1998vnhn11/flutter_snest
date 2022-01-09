@@ -26,29 +26,30 @@ class _ChatsState extends State<Chats>
       appBar: AppBar(
         title: const TextField(
           decoration: InputDecoration.collapsed(
-            hintText: 'Search',
+            hintText: 'Tìm kiếm',
+            hintStyle: TextStyle(color: Colors.white),
           ),
+          style: TextStyle(color: Colors.white),
+          cursorColor: Colors.white,
         ),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(
-              Icons.filter_list,
-            ),
+            icon: const Icon(Icons.add),
             onPressed: () {},
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Theme.of(context).colorScheme.secondary,
-          labelColor: Theme.of(context).colorScheme.secondary,
-          unselectedLabelColor: Theme.of(context).textTheme.caption?.color,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white.withOpacity(0.5),
           isScrollable: false,
           tabs: const <Widget>[
             Tab(
-              text: "Message",
+              text: "Tin nhắn",
             ),
             Tab(
-              text: "Groups",
+              text: "Nhóm",
             ),
           ],
         ),
@@ -57,7 +58,7 @@ class _ChatsState extends State<Chats>
         controller: _tabController,
         children: <Widget>[
           ListView.separated(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(5),
             separatorBuilder: (BuildContext context, int index) {
               return Align(
                 alignment: Alignment.centerRight,
@@ -107,13 +108,6 @@ class _ChatsState extends State<Chats>
             },
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        onPressed: () {},
       ),
     );
   }

@@ -34,7 +34,7 @@ class _ConversationState extends State<Conversation> {
                 padding: const EdgeInsets.only(left: 0.0, right: 10.0),
                 child: CircleAvatar(
                   backgroundImage: AssetImage(
-                    "assets/cm${random.nextInt(10)}.jpeg",
+                    "images/cm${random.nextInt(10)}.jpeg",
                   ),
                 ),
               ),
@@ -87,7 +87,7 @@ class _ConversationState extends State<Conversation> {
                   return ChatBubble(
                     message: msg['type'] == "text"
                         ? messages[random.nextInt(10)]
-                        : "assets/cm${random.nextInt(10)}.jpeg",
+                        : "images/cm${random.nextInt(10)}.jpeg",
                     username: msg["username"],
                     time: msg["time"],
                     type: msg['type'],

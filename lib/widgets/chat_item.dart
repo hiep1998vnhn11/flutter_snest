@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:snest/widgets/chat/conversation.dart';
+import 'package:snest/screens/chat/conversation.dart';
+import 'package:snest/util/router.dart';
 
 class ChatItem extends StatefulWidget {
   final String dp;
@@ -113,13 +114,15 @@ class _ChatItemState extends State<ChatItem> {
           ],
         ),
         onTap: () {
-          Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (BuildContext context) {
-                return const Conversation();
-              },
-            ),
-          );
+          Navigate.pushPage(context, const Conversation());
+
+          // Navigator.of(context, rootNavigator: true).push(
+          //   MaterialPageRoute(
+          //     builder: (BuildContext context) {
+          //       return const Conversation();
+          //     },
+          //   ),
+          // );
         },
       ),
     );
