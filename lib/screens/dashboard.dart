@@ -22,6 +22,7 @@ class _DashboardState extends State<Dashboard> {
   List posts = [];
   int itemCount = 0;
   bool isOver = false;
+  int indexSelected = -1;
 
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
@@ -45,6 +46,7 @@ class _DashboardState extends State<Dashboard> {
         'limit': '$limit',
       };
       List res = await HttpService.get('/v1/user/post', query);
+      print(res.length < limit);
       setState(() {
         if (res.length < limit) {
           isOver = true;
@@ -74,7 +76,6 @@ class _DashboardState extends State<Dashboard> {
     if (success) {
       _refreshController.loadComplete();
     } else {
-      print('noData');
       _refreshController.loadNoData();
     }
   }
@@ -142,9 +143,19 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  Future<void> _handleLike(int postId, String? likeStatus) async {
+    try {
+      await HttpService.post(
+        '/v1/user/post/$postId/handle_like',
+        {'status': likeStatus ?? '0'},
+      );
+    } catch (err) {
+      print(err);
+    }
+  }
+
   Widget _buildPostItem(BuildContext context, int index) {
     final post = posts[index];
-    // print(post);
     final List<String> images = (post['images'] as List)
         .map((image) => image['path'] as String)
         .toList();
@@ -156,6 +167,27 @@ class _DashboardState extends State<Dashboard> {
       images: images,
       id: post['id'],
       privacy: post['privacy'],
+      pid: post['uid'],
+      onLike: _handleLike,
+      likeStatus: post['like_status'] != null
+          ? '${post['like_status']['status']}'
+          : null,
+      onOptions: () {
+        _showBottomModal(context);
+        setState(
+          () {
+            indexSelected = index;
+          },
+        );
+      },
+      onShare: () {
+        _showBottomShareModal(context);
+        setState(
+          () {
+            indexSelected = index;
+          },
+        );
+      },
     );
   }
 
@@ -180,96 +212,148 @@ class _DashboardState extends State<Dashboard> {
 
   _showBottomModal(context) {
     showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        builder: (builder) {
-          return Container(
-            height: 800,
-            color: Colors.transparent,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  topRight: Radius.circular(10.0),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10.0, // has the effect of softening the shadow
-                    spreadRadius: 0.0, // has the effect of extending the shadow
-                  )
-                ],
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (builder) {
+        return Container(
+          height: 300,
+          color: Colors.transparent,
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10.0),
+                topRight: Radius.circular(10.0),
               ),
-              alignment: Alignment.topLeft,
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Container(
-                        margin: const EdgeInsets.only(top: 5, left: 10),
-                        child: const Text(
-                          "Bottom Modal",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.black87),
-                        ),
-                      ),
-                      Container(
-                          margin: const EdgeInsets.only(top: 5, right: 5),
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              "Save",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff999999),
-                              ),
-                            ),
-                          )),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          color: Color(0xfff8f8f8),
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          textAlign: TextAlign.justify,
-                          text: const TextSpan(
-                              text:
-                                  "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                  wordSpacing: 1)),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10.0, // has the effect of softening the shadow
+                  spreadRadius: 0.0, // has the effect of extending the shadow
+                )
+              ],
             ),
-          );
-        });
+            alignment: Alignment.topLeft,
+            child: Column(
+              children: <Widget>[
+                _buildOptionItem(
+                  icon: const Icon(Icons.bookmark_add),
+                  title: 'Lưu liên kết',
+                  description: 'Thêm vào danh sách liên kết của bạn',
+                ),
+                const Divider(),
+                _buildOptionItem(
+                  icon: const Icon(Icons.bookmark_add),
+                  title: 'Lưu liên kết',
+                  description: 'Thêm vào danh sách liên kết của bạn',
+                ),
+                const Divider(),
+                _buildOptionItem(
+                  icon: const Icon(Icons.bookmark_add),
+                  title: 'Lưu liên kết',
+                  description: 'Thêm vào danh sách liên kết của bạn',
+                ),
+                const Divider(),
+                _buildOptionItem(
+                  icon: const Icon(Icons.bookmark_add),
+                  title: 'Lưu liên kết',
+                  description: 'Thêm vào danh sách liên kết của bạn',
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _showBottomShareModal(context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (builder) {
+        return Container(
+          height: 300,
+          color: Colors.transparent,
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10.0),
+                topRight: Radius.circular(10.0),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10.0, // has the effect of softening the shadow
+                  spreadRadius: 0.0, // has the effect of extending the shadow
+                )
+              ],
+            ),
+            alignment: Alignment.topLeft,
+            child: Column(
+              children: <Widget>[
+                _buildOptionItem(
+                  icon: const Icon(Icons.bookmark_add),
+                  title: 'Lưu liên kết',
+                  description: 'Thêm vào danh sách liên kết của bạn',
+                ),
+                const Divider(),
+                _buildOptionItem(
+                  icon: const Icon(Icons.bookmark_add),
+                  title: 'Lưu liên kết',
+                  description: 'Thêm vào danh sách liên kết của bạn',
+                ),
+                const Divider(),
+                _buildOptionItem(
+                  icon: const Icon(Icons.bookmark_add),
+                  title: 'Lưu liên kết',
+                  description: 'Thêm vào danh sách liên kết của bạn',
+                ),
+                const Divider(),
+                _buildOptionItem(
+                  icon: const Icon(Icons.bookmark_add),
+                  title: 'Lưu liên kết',
+                  description: 'Thêm vào danh sách liên kết của bạn',
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOptionItem({
+    required Icon icon,
+    required String title,
+    required String description,
+  }) {
+    return InkWell(
+      onTap: () {
+        print('123');
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 5),
+        child: Row(
+          children: [
+            icon,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(description, style: const TextStyle(fontSize: 12)),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   _showFullModal(context) {
@@ -332,24 +416,26 @@ class _DashboardState extends State<Dashboard> {
                 children: [
                   Expanded(
                     child: ListView.separated(
-                        itemBuilder: _itemBuilder,
-                        separatorBuilder: (_, __) {
-                          return const SizedBox(
-                            height: 2,
-                          );
-                        },
-                        itemCount: 20),
+                      itemBuilder: _itemBuilder,
+                      separatorBuilder: (_, __) {
+                        return const SizedBox(
+                          height: 2,
+                        );
+                      },
+                      itemCount: 20,
+                    ),
                   ),
                   const Text('Thử tìm'),
                   Expanded(
                     child: ListView.separated(
-                        itemBuilder: _itemBuilder,
-                        separatorBuilder: (_, __) {
-                          return const SizedBox(
-                            height: 2,
-                          );
-                        },
-                        itemCount: 20),
+                      itemBuilder: _itemBuilder,
+                      separatorBuilder: (_, __) {
+                        return const SizedBox(
+                          height: 2,
+                        );
+                      },
+                      itemCount: 20,
+                    ),
                   )
                 ],
               ))

@@ -15,8 +15,12 @@ class _ChatState extends State<Chat> {
       appBar: AppBar(
         title: const TextField(
           decoration: InputDecoration.collapsed(
-              hintText: 'Tìm kiếm', hintStyle: TextStyle(color: Colors.white)),
-          style: TextStyle(color: Colors.white),
+            hintText: 'Tìm kiếm',
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          style: TextStyle(color: Colors.black),
           cursorColor: Colors.white,
         ),
         actions: [

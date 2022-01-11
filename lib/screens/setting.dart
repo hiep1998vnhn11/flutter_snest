@@ -64,12 +64,12 @@ class _SettingState extends State<Setting> {
                         Container(
                           width: 50,
                           child: Obx(
-                            () => authController.user.value != null &&
-                                    authController.user.value!['avatar']
+                            () => authController.user.value['avatar'] != null
                                 ? CircleAvatar(
                                     radius: 25,
                                     backgroundImage: NetworkImage(
-                                        authController.user.value!['avatar']),
+                                      authController.user.value['avatar'],
+                                    ),
                                   )
                                 : const CircleAvatar(
                                     radius: 25,
@@ -92,7 +92,7 @@ class _SettingState extends State<Setting> {
                             children: [
                               Obx(
                                 () => Text(
-                                  authController.user.value?['full_name'] ??
+                                  authController.user.value['full_name'] ??
                                       'Hiệp Trần',
                                   style: const TextStyle(
                                     fontSize: 16,
@@ -342,7 +342,7 @@ class _SettingState extends State<Setting> {
 
   void _logout() async {
     authController.setToken(null);
-    authController.setUser(null);
+    authController.setUser({});
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
     Navigate.pushPageReplacement(context, const Login());

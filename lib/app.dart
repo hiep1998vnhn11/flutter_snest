@@ -26,13 +26,14 @@ class MyApp extends StatelessWidget {
       final String? token = prefs.getString('token');
       if (token != null) {
         authController.setToken(token);
-        // if (authController.user.value == null) {
-        //   Map<String, dynamic> user = await HttpService.post('/auth/me');
-        //   authController.setUser(user);
-        // }
+        if (authController.user.value['id'] == null) {
+          var user = await HttpService.post('/auth/me');
+          authController.setUser(user);
+        }
       }
       return token ?? '';
     } catch (e) {
+      print(e);
       return '';
     }
   }

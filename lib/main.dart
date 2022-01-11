@@ -17,17 +17,29 @@ class App extends StatelessWidget {
     return GetMaterialApp(
       title: 'Snest',
       theme: ThemeData(
-          brightness: Brightness.light,
-          // This is the theme of your application.
-          //
-          // Try running your application with "flutter run". You'll see the
-          // application has a blue toolbar. Then, without quitting the app, try
-          // changing the primarySwatch below to Colors.green and then invoke
-          // "hot reload" (press "r" in the console where you ran "flutter run",
-          // or simply save your changes to "hot reload" in a Flutter IDE).
-          // Notice that the counter didn't reset back to zero; the application
-          // is not restarted.
-          primarySwatch: Colors.blue),
+        brightness: Brightness.light,
+        primarySwatch: const MaterialColor(0xFFFFFFFF, {
+          50: Color(0xFFFFFFEE),
+          100: Color(0xFFFFEEFF),
+          200: Color(0xFFFEEEFF),
+          300: Color(0xFFEEEEEE),
+          400: Color(0xFFFFFFFF),
+          500: Color(0xFFFFFFFF),
+          600: Color(0xFFFEEEFF),
+          700: Color(0xFFFEEEFF),
+          800: Color(0xFFFEEEFF),
+          900: Color(0xFFFFFFFF),
+        }),
+        primaryColor: const Color(0x22222222),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ),
+      ),
       darkTheme: ThemeData(
           brightness: Brightness.dark,
           primaryColor: Colors.blueGrey,

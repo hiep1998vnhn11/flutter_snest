@@ -41,6 +41,8 @@ dependencies:
   pull_to_refresh: ^2.0.0
   shimmer: ^2.0.0
   flutter_reaction_button: ^2.0.0+1
+  image_picker: ^0.8.4+4
+  video_player: ^2.2.10
 
 dev_dependencies:
   flutter_test:

@@ -27,10 +27,10 @@ class _ChatsState extends State<Chats>
         title: const TextField(
           decoration: InputDecoration.collapsed(
             hintText: 'Tìm kiếm',
-            hintStyle: TextStyle(color: Colors.white),
+            hintStyle: TextStyle(color: Colors.black),
           ),
-          style: TextStyle(color: Colors.white),
-          cursorColor: Colors.white,
+          style: TextStyle(color: Colors.lightBlue),
+          cursorColor: Colors.lightBlue,
         ),
         actions: <Widget>[
           IconButton(
@@ -40,8 +40,7 @@ class _ChatsState extends State<Chats>
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Theme.of(context).colorScheme.secondary,
-          labelColor: Colors.white,
+          // indicatorColor: Theme.of(context).colorScheme.secondary,
           unselectedLabelColor: Colors.white.withOpacity(0.5),
           isScrollable: false,
           tabs: const <Widget>[
