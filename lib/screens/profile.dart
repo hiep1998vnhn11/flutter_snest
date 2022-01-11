@@ -4,6 +4,7 @@ import 'package:snest/util/data.dart';
 import 'package:get/get.dart';
 import 'package:snest/store/auth.dart';
 import 'package:snest/util/http.dart';
+import 'package:snest/util/router.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key, required this.id}) : super(key: key);
@@ -37,7 +38,6 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    print(user);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -88,10 +88,6 @@ class _ProfileState extends State<Profile> {
                       width: 35,
                       child: const Center(
                         child: SizedBox(
-                          // decoration: BoxDecoration(
-                          //   color: Colors.greenAccent,
-                          //   borderRadius: BorderRadius.circular(12),
-                          // ),
                           child: Icon(Icons.camera_alt, size: 20),
                           height: 20,
                           width: 20,
@@ -209,15 +205,58 @@ class _ProfileState extends State<Profile> {
                   TextButton(
                     child: const Icon(
                       Icons.message,
+                      size: 20,
+                      color: Colors.grey,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      print('123');
+                      Get.to(
+                        () => const Profile(
+                          key: Key('edb1d5bf-472e-3944-bd29-c2a139848662'),
+                          id: 'edb1d5bf-472e-3944-bd29-c2a139848662',
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(width: 10),
                   TextButton(
                     child: const Icon(
                       Icons.add,
+                      color: Colors.grey,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.replace(
+                        () => Profile(
+                          id: '65c60f3e-9228-313c-bdd2-ec249c023113',
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  TextButton(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.favorite,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          '${user['info']?['likes'] ?? 0}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      Get.to(
+                        () => Profile(
+                          id: '74df8e70-c94d-3d30-8719-0445372817e7',
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -269,6 +308,7 @@ class _ProfileState extends State<Profile> {
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
+            color: Colors.grey,
           ),
         ),
         const SizedBox(height: 4),

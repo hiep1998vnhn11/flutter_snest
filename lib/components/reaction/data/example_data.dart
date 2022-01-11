@@ -210,3 +210,54 @@ Container _buildReactionsIcon(String path, Text text) {
     ),
   );
 }
+
+class PostBuilder {
+  static Widget _buildLikeItem(Map<String, dynamic> like) {
+    if (like['status'] == 1) {
+      return const CircleAvatar(
+        backgroundImage: AssetImage('images/reactions/like.png'),
+        radius: 9,
+      );
+    }
+    if (like['status'] == 2) {
+      return const CircleAvatar(
+        backgroundImage: AssetImage('images/reactions/love.png'),
+        radius: 9,
+      );
+    }
+    if (like['status'] == 3) {
+      return const CircleAvatar(
+        backgroundImage: AssetImage('images/reactions/care.png'),
+        radius: 9,
+      );
+    }
+    if (like['status'] == 4) {
+      return const CircleAvatar(
+        backgroundImage: AssetImage('images/reactions/haha.png'),
+        radius: 9,
+      );
+    }
+    if (like['status'] == 5) {
+      return const CircleAvatar(
+        backgroundImage: AssetImage('images/reactions/wow.png'),
+        radius: 9,
+      );
+    }
+    if (like['status'] == 6) {
+      return const CircleAvatar(
+        backgroundImage: AssetImage('images/reactions/sad.png'),
+        radius: 9,
+      );
+    }
+    if (like['status'] == 7) {
+      return const CircleAvatar(
+        backgroundImage: AssetImage('images/reactions/angry.png'),
+        radius: 9,
+      );
+    }
+    return const CircleAvatar(
+      backgroundImage: AssetImage('images/reactions/like.png'),
+      radius: 9,
+    );
+  }
+}

@@ -52,72 +52,76 @@ class _SettingState extends State<Setting> {
                   )
                 ],
               ),
-              GestureDetector(
-                onTap: () {
-                  Get.to(() => const Profile(id: 'hiep'));
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 50,
-                          child: Obx(
-                            () => authController.user.value['avatar'] != null
-                                ? CircleAvatar(
-                                    radius: 25,
-                                    backgroundImage: NetworkImage(
-                                      authController.user.value['avatar'],
-                                    ),
-                                  )
-                                : const CircleAvatar(
-                                    radius: 25,
-                                    backgroundImage:
-                                        AssetImage('images/facebook.png'),
-                                  ),
-                          ),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                              width: 1.0,
-                            ),
-                          ),
+              Obx(() => GestureDetector(
+                    onTap: () {
+                      Get.to(
+                        () => Profile(
+                          id: authController.user.value['url'],
+                          key: Key('${authController.user.value['url']}'),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Obx(
-                                () => Text(
-                                  authController.user.value['full_name'] ??
-                                      'Hiệp Trần',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 50,
+                              child: authController
+                                          .user.value['profile_photo_path'] !=
+                                      null
+                                  ? CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage: NetworkImage(
+                                        authController
+                                            .user.value['profile_photo_path'],
+                                      ),
+                                    )
+                                  : const CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage:
+                                          AssetImage('images/facebook.png'),
+                                    ),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                  width: 1.0,
                                 ),
                               ),
-                              Text(
-                                'Xem trang cá nhân của bạn',
-                                style: TextStyle(
-                                    color: Theme.of(context).primaryColor),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    authController.user.value['full_name'] ??
+                                        '',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Xem trang cá nhân của bạn',
+                                    style:
+                                        TextStyle(color: Colors.grey.shade600),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
+                        Radio(
+                          value: true,
+                          groupValue: true,
+                          onChanged: (bool? value) {},
                         ),
                       ],
                     ),
-                    Radio(
-                      value: true,
-                      groupValue: true,
-                      onChanged: (bool? value) {},
-                    ),
-                  ],
-                ),
-              ),
+                  )),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -341,7 +345,7 @@ class _SettingState extends State<Setting> {
   }
 
   void _logout() async {
-    authController.setToken(null);
+    authController.setToken('');
     authController.setUser({});
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('token');

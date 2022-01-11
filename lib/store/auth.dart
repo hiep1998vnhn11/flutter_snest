@@ -7,5 +7,5 @@ class AuthController extends GetxController {
 
   increate() => count++;
   setUser(Map<String, dynamic> data) => user.value = data;
-  setToken(String? data) => token.value = data;
+  setToken(String data) => token.value = data;
 }

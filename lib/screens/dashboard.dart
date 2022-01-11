@@ -7,6 +7,12 @@ import 'dart:async';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:snest/components/post_item.dart';
 import 'package:snest/util/http.dart';
+import 'package:snest/util/format/date.dart';
+import 'package:snest/store/post.dart';
+
+class DashboardController {
+  late void Function(Map<String, dynamic>) _onCreateSuccess;
+}
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -17,10 +23,9 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   final AuthController authController = Get.find();
+  final PostController postController = Get.put(PostController());
   String input = '';
   Timer? _debouncer;
-  List posts = [];
-  int itemCount = 0;
   bool isOver = false;
   int indexSelected = -1;
 
@@ -33,32 +38,26 @@ class _DashboardState extends State<Dashboard> {
       int offset = 0;
       const int limit = 5;
       if (isRefresh != true) {
-        offset = itemCount;
+        offset = postController.postCount.value;
       } else {
         setState(() {
           isOver = false;
-          itemCount = 0;
-          posts = [];
         });
+        postController.clearPosts();
+        postController.setPostCount(0);
       }
       var query = {
         'offset': '$offset',
         'limit': '$limit',
       };
       List res = await HttpService.get('/v1/user/post', query);
-      print(res.length < limit);
       setState(() {
         if (res.length < limit) {
           isOver = true;
         }
-        if (isRefresh != true) {
-          posts.addAll(res);
-          itemCount += res.length;
-        } else {
-          posts = res;
-          itemCount = res.length;
-        }
       });
+      postController.addPostCount(res.length);
+      postController.addAllPosts(res);
       return true;
     } catch (e) {
       print(e);
@@ -126,7 +125,8 @@ class _DashboardState extends State<Dashboard> {
           )
         ],
       ),
-      body: SmartRefresher(
+      body: Obx(
+        () => SmartRefresher(
           enablePullDown: true,
           enablePullUp: true,
           header: const WaterDropMaterialHeader(),
@@ -137,9 +137,11 @@ class _DashboardState extends State<Dashboard> {
           onRefresh: _onRefresh,
           onLoading: _onLoading,
           child: ListView.builder(
-            itemCount: itemCount,
+            itemCount: postController.postCount.value,
             itemBuilder: _buildPostItem,
-          )),
+          ),
+        ),
+      ),
     );
   }
 
@@ -155,23 +157,33 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Widget _buildPostItem(BuildContext context, int index) {
-    final post = posts[index];
+    final post = postController.posts[index];
     final List<String> images = (post['images'] as List)
         .map((image) => image['path'] as String)
         .toList();
+    int likeCount = 0;
+    List likeGroup = [];
+    if (post['like_group'] != null) {
+      (post['like_group'] as List).forEach((element) {
+        if (likeGroup.length < 3) {
+          likeGroup.add(element);
+        }
+        likeCount += element['counter'] as int;
+      });
+    }
     return PostItem(
       name: post['user_name'],
       avatar: post['user_profile_photo_path'],
-      time: post['created_at'],
+      time: FormatDate.formatTimeAgo(post['created_at']),
       content: post['content'],
       images: images,
       id: post['id'],
       privacy: post['privacy'],
       pid: post['uid'],
+      likeGroup: likeGroup,
+      likeCount: likeCount,
       onLike: _handleLike,
-      likeStatus: post['like_status'] != null
-          ? '${post['like_status']['status']}'
-          : null,
+      likeStatus: post['like_status'] != null ? '${post['like_status']}' : null,
       onOptions: () {
         _showBottomModal(context);
         setState(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:snest/util/http.dart';
 import 'package:snest/util/router.dart';
 import 'package:snest/store/auth.dart';
+import 'package:snest/store/post.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
@@ -21,18 +23,18 @@ class CreatePost extends StatefulWidget {
 
 class _CreatePostState extends State<CreatePost> {
   final AuthController authController = Get.find();
+  final PostController postController = Get.find();
   String content = '';
+  String privacy = '1';
   List images = [];
-
   List<XFile>? _imageFileList;
-
   set _imageFile(XFile? value) {
     _imageFileList = value == null ? null : [value];
   }
 
   dynamic _pickImageError;
   bool isVideo = false;
-
+  bool loading = false;
   VideoPlayerController? _controller;
   VideoPlayerController? _toBeDisposed;
   String? _retrieveDataError;
@@ -41,6 +43,51 @@ class _CreatePostState extends State<CreatePost> {
   final TextEditingController maxWidthController = TextEditingController();
   final TextEditingController maxHeightController = TextEditingController();
   final TextEditingController qualityController = TextEditingController();
+  void _toastError(String value) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(value),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void _toastSuccess(String value) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          value,
+          style: const TextStyle(color: Colors.green),
+        ),
+        backgroundColor: Colors.grey.shade200,
+      ),
+    );
+  }
+
+  Future<void> _createPost() async {
+    try {
+      setState(() {
+        loading = true;
+      });
+      final Map<String, dynamic> params = {
+        'content': content,
+        'privacy': privacy
+      };
+      final Map<String, dynamic> post =
+          await HttpService.post('/v1/user/post', params);
+      _toastSuccess('Đăng bài viết mới thành công!');
+      postController.addPost(post);
+      Navigator.of(context).pop();
+    } catch (e) {
+      _toastError('Hãy điền nội dung hoặc đăng tải một ảnh hoặc video');
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
 
   Future<void> _playVideo(XFile? file) async {
     if (file != null && mounted) {
@@ -71,7 +118,6 @@ class _CreatePostState extends State<CreatePost> {
     BuildContext? context,
     bool isMultiImage = false,
   }) async {
-    print(isVideo);
     if (_controller != null) {
       await _controller!.setVolume(0.0);
     }
@@ -169,21 +215,22 @@ class _CreatePostState extends State<CreatePost> {
     }
     if (_imageFileList != null) {
       return Semantics(
-          child: ListView.builder(
-            key: UniqueKey(),
-            itemBuilder: (context, index) {
-              // Why network for web?
-              // See https://pub.dev/packages/image_picker#getting-ready-for-the-web-platform
-              return Semantics(
-                label: 'image_picker_example_picked_image',
-                child: kIsWeb
-                    ? Image.network(_imageFileList![index].path)
-                    : Image.file(File(_imageFileList![index].path)),
-              );
-            },
-            itemCount: _imageFileList!.length,
-          ),
-          label: 'image_picker_example_picked_images');
+        child: ListView.builder(
+          key: UniqueKey(),
+          itemBuilder: (context, index) {
+            // Why network for web?
+            // See https://pub.dev/packages/image_picker#getting-ready-for-the-web-platform
+            return Semantics(
+              label: 'image_picker_example_picked_image',
+              child: kIsWeb
+                  ? Image.network(_imageFileList![index].path)
+                  : Image.file(File(_imageFileList![index].path)),
+            );
+          },
+          itemCount: _imageFileList!.length,
+        ),
+        label: 'image_picker_example_picked_images',
+      );
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
@@ -238,62 +285,64 @@ class _CreatePostState extends State<CreatePost> {
   Future<void> _displayPickImageDialog(
       BuildContext context, OnPickImageCallback onPick) async {
     return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Add optional parameters'),
-            content: Column(
-              children: <Widget>[
-                TextField(
-                  controller: maxWidthController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                      hintText: "Enter maxWidth if desired"),
-                ),
-                TextField(
-                  controller: maxHeightController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                      hintText: "Enter maxHeight if desired"),
-                ),
-                TextField(
-                  controller: qualityController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                      hintText: "Enter quality if desired"),
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('CANCEL'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add optional parameters'),
+          content: Column(
+            children: <Widget>[
+              TextField(
+                controller: maxWidthController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                    hintText: "Enter maxWidth if desired"),
               ),
-              TextButton(
-                  child: const Text(
-                    'PICK',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  onPressed: () {
-                    double? width = maxWidthController.text.isNotEmpty
-                        ? double.parse(maxWidthController.text)
-                        : null;
-                    double? height = maxHeightController.text.isNotEmpty
-                        ? double.parse(maxHeightController.text)
-                        : null;
-                    int? quality = qualityController.text.isNotEmpty
-                        ? int.parse(qualityController.text)
-                        : null;
-                    onPick(width, height, quality);
-                    Navigator.of(context).pop();
-                  }),
+              TextField(
+                controller: maxHeightController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                    hintText: "Enter maxHeight if desired"),
+              ),
+              TextField(
+                controller: qualityController,
+                keyboardType: TextInputType.number,
+                decoration:
+                    const InputDecoration(hintText: "Enter quality if desired"),
+              ),
             ],
-          );
-        });
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'PICK',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                double? width = maxWidthController.text.isNotEmpty
+                    ? double.parse(maxWidthController.text)
+                    : null;
+                double? height = maxHeightController.text.isNotEmpty
+                    ? double.parse(maxHeightController.text)
+                    : null;
+                int? quality = qualityController.text.isNotEmpty
+                    ? int.parse(qualityController.text)
+                    : null;
+                onPick(width, height, quality);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -306,10 +355,22 @@ class _CreatePostState extends State<CreatePost> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check, color: Colors.blue),
-            onPressed: () {},
-          ),
+          loading
+              ? const SizedBox(
+                  height: 24,
+                  width: 40,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 16, bottom: 16, right: 16),
+                    child: CircularProgressIndicator(
+                      color: Colors.blue,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.check, color: Colors.blue),
+                  onPressed: _createPost,
+                ),
         ],
       ),
       floatingActionButton: Column(
@@ -405,7 +466,7 @@ class _CreatePostState extends State<CreatePost> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
+      body: Center(
         child: Column(
           children: <Widget>[
             Padding(
@@ -415,11 +476,17 @@ class _CreatePostState extends State<CreatePost> {
                   Row(
                     children: [
                       Obx(
-                        () => CircleAvatar(
-                          radius: 20,
-                          backgroundImage: NetworkImage(
-                              authController.user.value['profile_photo_path']),
-                        ),
+                        () => authController.user.value['profile_photo_path'] ==
+                                null
+                            ? const CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('images/avatar-default.png'),
+                              )
+                            : CircleAvatar(
+                                radius: 20,
+                                backgroundImage: NetworkImage(authController
+                                    .user.value['profile_photo_path']),
+                              ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 10),

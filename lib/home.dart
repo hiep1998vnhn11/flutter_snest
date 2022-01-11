@@ -30,6 +30,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   final PageStorageBucket bucket = PageStorageBucket();
   Widget currentSreen = const Dashboard();
 
+  _onFloatingActionPress() {
+    Navigate.pushPage(context, const CreatePost());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,9 +42,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         child: currentSreen,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigate.pushPage(context, const CreatePost());
-        },
+        onPressed: _onFloatingActionPress,
         child: const Icon(Icons.add),
         shape: const CircleBorder(),
       ),
@@ -76,8 +78,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       Text(
                         'Trang chủ',
                         style: TextStyle(
-                            color: currentTab == 0 ? Colors.blue : Colors.grey,
-                            fontSize: 10),
+                          color: currentTab == 0 ? Colors.blue : Colors.grey,
+                          fontSize: 10,
+                        ),
                       )
                     ],
                   ),
@@ -104,8 +107,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       Text(
                         'Tin nhắn',
                         style: TextStyle(
-                            color: currentTab == 1 ? Colors.blue : Colors.grey,
-                            fontSize: 10),
+                          color: currentTab == 1 ? Colors.blue : Colors.grey,
+                          fontSize: 10,
+                        ),
                       )
                     ],
                   ),
